@@ -1,8 +1,8 @@
 const readline = require('readline');
-const runningMedian = require('./runningMedian')
+const runningMedian = require('./runningMedian');
 
-console.log('Enter a number and press Enter to add a number to the running median calculator.')
-console.log('You can exit with Ctrl + c')
+console.log('Enter a number and press Enter to add a number to the running median calculator.');
+console.log('You can exit with Ctrl + c');
 
 const rl = readline.createInterface({
 	input: process.stdin,
