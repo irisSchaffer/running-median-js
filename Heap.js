@@ -1,79 +1,84 @@
-class Heap {
-    constructor(sorter) {
-        this.elements = []
-        this.sorter = sorter
-    }
+const heap = sorter => {
+    let elements = [];
 
-    root() { return this.elements[0] }
-    empty() { return this.elements.length === 0 }
-    length() { return this.elements.length }
+    const root = _ => elements[0];
+    const empty = _ => elements.length === 0;
+    const length = _ => elements.length;
 
-    parentIndex(i) { return Math.floor((i - 1) / 2) }
-    rightIndex(i) { return 2 * i + 2 }
-    leftIndex(i) { return 2 * i + 1 }
+    const parentIndex = i => Math.floor((i - 1) / 2);
+    const rightIndex = i => 2 * i + 2;
+    const leftIndex = i => 2 * i + 1;
 
-    hasIndex(i) { return i >= 0 && i < this.length() }
-    hasParent(i) { return this.hasIndex(this.parentIndex(i)) }
-    hasRight(i) { return this.hasIndex(this.rightIndex(i)) }
-    hasLeft(i) { return this.hasIndex(this.leftIndex(i)) }
+    const hasIndex = i => i >= 0 && i < length();
+    const hasParent = i => hasIndex(parentIndex(i));
+    const hasRight = i => hasIndex(rightIndex(i));
+    const hasLeft = i => hasIndex(leftIndex(i));
 
-    parent(i) { return this.elements[this.parentIndex(i)] }
-    left(i) { return this.elements[this.leftIndex(i)] }
-    right(i) { return this.elements[this.rightIndex(i)] }
+    const parent = i => elements[parentIndex(i)];
+    const left = i => elements[leftIndex(i)];
+    const right = i => elements[rightIndex(i)];
 
-    remove() {
-        const root = this.elements[0]
-        if (this.length() === 1) {
-            this.elements = []
-            return root
+    const higher = (a, b) => sorter(a, b) < 0;
+
+    const swap = (i, j) => {
+        const temp = elements[i];
+        elements[i] = elements[j];
+        elements[j] = temp;
+    };
+
+    const heapifyUp = start => {
+        let i = start;
+        while (hasParent(i) && higher(elements[i], parent(i))) {
+            swap(i, parentIndex(i));
+            i = parentIndex(i);
         }
-        this.elements[0] = this.elements.pop()
-        this.heapifyDown(0)
-        return root
-    }
+    };
 
-    insert(data) {
-        this.elements.push(data)
-        this.heapifyUp(this.length() - 1)
-    }
-
-    swap(i, j) {
-        const temp = this.elements[i]
-        this.elements[i] = this.elements[j]
-        this.elements[j] = temp
-    }
-
-    higher(a, b) {
-        return this.sorter(a, b) < 0
-    }
-
-    heapifyUp(start) {
-        let i = start
-        while (this.hasParent(i) && this.higher(this.elements[i], this.parent(i))) {
-            this.swap(i, this.parentIndex(i))
-            i = this.parentIndex(i)
-        }
-    }
-
-    heapifyDown(start) {
-        let i = start
-        while (this.hasLeft(i)) {
+    const heapifyDown = start => {
+        let i = start;
+        while (hasLeft(i)) {
             if (
-                this.higher(this.left(i), this.elements[i])
-                || (this.hasRight(i) && this.higher(this.right(i), this.elements[i]))
+                higher(left(i), elements[i])
+                || (hasRight(i) && higher(right(i), elements[i]))
             ) {
-                if (!this.hasRight(i) || this.higher(this.left(i), this.right(i))) {
-                    this.swap(i, this.leftIndex(i))
-                    i = this.leftIndex(i)
+                if (!hasRight(i) || higher(left(i), right(i))) {
+                    swap(i, leftIndex(i));
+                    i = leftIndex(i);
                 } else {
-                    this.swap(i, this.rightIndex(i))
-                    i = this.rightIndex(i)
+                    swap(i, rightIndex(i));
+                    i = rightIndex(i);
                 }
             } else {
-                break
+                break;
             }
         }
-    }
+    };
+
+    const remove = _ => {
+        const root = elements[0];
+
+        if (length() === 1) {
+            elements = [];
+        } else {
+            elements[0] = elements.pop();
+            heapifyDown(0);
+        }
+
+        return root;
+    };
+
+    const insert = data => {
+        elements.push(data);
+        heapifyUp(length() - 1);
+    };
+
+    return {
+        remove,
+        insert,
+        length,
+        empty,
+        root
+    };
 }
 
-module.exports = Heap
+module.exports = heap;
